@@ -1,49 +1,56 @@
--- Drop tables if they exist
+-- Drop the CheckedIn table if it exists first (depends on Neighbor and Week)
 DROP TABLE IF EXISTS CheckedIn;
+
+-- Drop the Address table if it exists (depends on Neighbor)
 DROP TABLE IF EXISTS Address;
-DROP TABLE IF EXISTS Week;
+
+-- Drop the Neighbor table if it exists
 DROP TABLE IF EXISTS Neighbor;
 
--- Create Neighbor table
-CREATE TABLE Neighbor (
-    NID INTEGER PRIMARY KEY,
-    PhoneNumber VARCHAR(20),
-    FirstName VARCHAR(50),
-    LastName VARCHAR(50),
-    Email VARCHAR(100),
-    CreationDate DATE,
-    LastVisit DATE,
-    Flag INTEGER,
-    NumberOfPeople INTEGER,
-    NumSeniors INTEGER,
-    NumAdults INTEGER,
-    NumChildren INTEGER,
-    Notes TEXT
+-- Drop the Week table if it exists (no dependencies)
+DROP TABLE IF EXISTS Week;
+
+-- Create the Neighbor table if not exists
+CREATE TABLE IF NOT EXISTS Neighbor (
+    nid INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    phonenumber VARCHAR(20),
+    firstname VARCHAR(50),
+    lastname VARCHAR(50),
+    email VARCHAR(100),
+    creationdate VARCHAR(10),  -- Kept as VARCHAR(10)
+    lastvisit VARCHAR(10),     -- Kept as VARCHAR(10)
+    flag INT,
+    numberofpeople INT,
+    numseniors INT,
+    numadults INT,
+    numchildren INT,
+    notes TEXT,
+    CONSTRAINT unique_neighbor_name_phone UNIQUE (firstname, lastname, phonenumber) -- Added unique constraint
 );
 
--- Create Week table
-CREATE TABLE Week (
-    StartDate DATE,
-    EndDate DATE,
-    PRIMARY KEY (StartDate, EndDate)
+-- Create the Week table if not exists
+CREATE TABLE IF NOT EXISTS Week (
+    startdate VARCHAR(10),     -- Kept as VARCHAR(10)
+    enddate VARCHAR(10),       -- Kept as VARCHAR(10)
+    PRIMARY KEY (startdate, enddate)
 );
 
--- Create CheckedIn table
-CREATE TABLE CheckedIn (
-    NID INTEGER,
-    StartDate DATE,
-    EndDate DATE,
-    PRIMARY KEY (NID, StartDate, EndDate),
-    FOREIGN KEY (NID) REFERENCES Neighbor(NID),
-    FOREIGN KEY (StartDate, EndDate) REFERENCES Week(StartDate, EndDate)
+-- Create the CheckedIn table if not exists
+CREATE TABLE IF NOT EXISTS CheckedIn (
+    nid INT,
+    startdate VARCHAR(10),     -- Kept as VARCHAR(10)
+    enddate VARCHAR(10),       -- Kept as VARCHAR(10)
+    PRIMARY KEY (nid, startdate, enddate),
+    FOREIGN KEY (nid) REFERENCES Neighbor(nid) ON DELETE CASCADE,
+    FOREIGN KEY (startdate, enddate) REFERENCES Week(startdate, enddate) ON DELETE CASCADE
 );
 
--- Create Address table
-CREATE TABLE Address (
-    NID INTEGER,
-    TownCity VARCHAR(100),
-    StreetAddress VARCHAR(200),
-    Zipcode INTEGER,
-    PRIMARY KEY (NID, TownCity, StreetAddress, Zipcode),
-    FOREIGN KEY (NID) REFERENCES Neighbor(NID)
+-- Create the Address table if not exists
+CREATE TABLE IF NOT EXISTS Address (
+    nid INT,
+    town_city VARCHAR(100),
+    streetaddress VARCHAR(200),
+    zipcode VARCHAR(10),
+    PRIMARY KEY (nid, town_city, streetaddress, zipcode),
+    FOREIGN KEY (nid) REFERENCES Neighbor(nid) ON DELETE CASCADE
 );
