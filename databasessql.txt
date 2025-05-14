@@ -1,0 +1,49 @@
+-- Drop tables if they exist
+DROP TABLE IF EXISTS CheckedIn;
+DROP TABLE IF EXISTS Address;
+DROP TABLE IF EXISTS Week;
+DROP TABLE IF EXISTS Neighbor;
+
+-- Create Neighbor table
+CREATE TABLE Neighbor (
+    NID INTEGER PRIMARY KEY,
+    PhoneNumber VARCHAR(20),
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Email VARCHAR(100),
+    CreationDate DATE,
+    LastVisit DATE,
+    Flag INTEGER,
+    NumberOfPeople INTEGER,
+    NumSeniors INTEGER,
+    NumAdults INTEGER,
+    NumChildren INTEGER,
+    Notes TEXT
+);
+
+-- Create Week table
+CREATE TABLE Week (
+    StartDate DATE,
+    EndDate DATE,
+    PRIMARY KEY (StartDate, EndDate)
+);
+
+-- Create CheckedIn table
+CREATE TABLE CheckedIn (
+    NID INTEGER,
+    StartDate DATE,
+    EndDate DATE,
+    PRIMARY KEY (NID, StartDate, EndDate),
+    FOREIGN KEY (NID) REFERENCES Neighbor(NID),
+    FOREIGN KEY (StartDate, EndDate) REFERENCES Week(StartDate, EndDate)
+);
+
+-- Create Address table
+CREATE TABLE Address (
+    NID INTEGER,
+    TownCity VARCHAR(100),
+    StreetAddress VARCHAR(200),
+    Zipcode INTEGER,
+    PRIMARY KEY (NID, TownCity, StreetAddress, Zipcode),
+    FOREIGN KEY (NID) REFERENCES Neighbor(NID)
+);
